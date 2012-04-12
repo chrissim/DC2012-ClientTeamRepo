@@ -1,12 +1,8 @@
 #include "GOS_PowerUp.h"
 
-size_t GOS_PowerUp::powerUpCount_ = 0;
-
-// constructor
-GOS_PowerUp::GOS_PowerUp(ObjectType type, int objID, double degree, double posX, double posY)
-: GameObjectStationary(type, objID, degree, posX, posY)
+GOS_PowerUp::BONUS GOS_PowerUp::getBonus() const
 {
-    powerUpCount_++;
+	return bonus_;
 }
 
 void GOS_PowerUp::update(const std::string &str)
@@ -14,22 +10,53 @@ void GOS_PowerUp::update(const std::string &str)
     std::istringstream istr(str);
     char endCheck;
     int type = -1;
-    int objID, degree, posX, posY;
-    
+    int bonus;
+    double degree, posX, posY, speed;
+    int objID, playerID, damage, ttl;
+    double sprite_w, sprite_h, hb_w, hb_h;
+    double tl_x, tl_y;
+    double tr_x, tr_y;
+    double bl_x, bl_y;
+    double br_x, br_y;
+
     istr >> type;
     switch(ObjectType(type))
     {
     case POWERUP:
-        istr >> objID >> degree >> posX >> posY >> endCheck;
-        
+        sprite_w = double(POWERUP_SPRITE_WIDTH);
+        sprite_h = double(POWERUP_SPRITE_HEIGHT);
+        hb_w = double(POWERUP_WIDTH);
+        hb_h = double(POWERUP_HEIGHT);
+
+        istr >> objID >> degree >> posX >> posY >> playerID >> speed >> ttl
+             >> damage
+             >> tl_x >> tl_y
+             >> tr_x >> tr_y
+             >> bl_x >> bl_y
+             >> br_x >> br_y
+             >> bonus
+             >> endCheck;
+
         if(!istr.good() || endCheck != POWERUP_STR)
-            break;
-            
+                break;
+
+        hb_.tLeft = Point(tl_x, tl_y);
+        hb_.tRight = Point(tr_x, tr_y);
+        hb_.bLeft = Point(bl_x, bl_y);
+        hb_.bRight = Point(br_x, br_y);
+
         type_ = ObjectType(type);
         objID_ = objID;
-        degree_.setDegree(double(degree));
-        pos_.setX(double(posX));
-        pos_.setY(double(posY));
+        degree_.setDegree(degree);
+        pos_.setX(posX);
+        pos_.setY(posY);
+        playerID_ = playerID;
+        speed_ = speed;
+        ttl_ = ttl;
+        damage_ = damage;
+        spritePt_.setX(pos_.getX()-(sprite_w/2));
+        spritePt_.setY(pos_.getY()-(sprite_h/2));
+        bonus_ = BONUS(bonus);
         break;
     }
 }
@@ -37,21 +64,31 @@ void GOS_PowerUp::update(const std::string &str)
 std::string GOS_PowerUp::toString() const
 {
     std::ostringstream ostr;
-    
+
     ostr << int(type_) << " ";
     ostr << objID_ << " ";
-    ostr << int(degree_.getDegree()) << " ";
-    ostr << int(pos_.getX()) << " ";
-    ostr << int(pos_.getY()) << " ";
+    ostr << degree_.getDegree() << " ";
+    ostr << pos_.getX() << " ";
+    ostr << pos_.getY() << " ";
+    ostr << playerID_ << " ";
+    ostr << speed_ << " ";
+    ostr << ttl_ << " ";
+    ostr << damage_ << " ";
+    ostr << hb_.tLeft.getX() << " ";
+    ostr << hb_.tLeft.getY() << " ";
+    ostr << hb_.tRight.getX() << " ";
+    ostr << hb_.tRight.getY() << " ";
+    ostr << hb_.bLeft.getX() << " ";
+    ostr << hb_.bLeft.getY() << " ";
+    ostr << hb_.bRight.getX() << " ";
+    ostr << hb_.bRight.getY() << " ";
+    ostr << int(bonus_) << " ";
     ostr << POWERUP_STR;
-    
+
     return ostr.str();
 }
 
-void GOS_PowerUp::print(std::ostream& os)const
+bool GOS_PowerUp::move()
 {
-    os << "Number #" << powerUpCount_ << " power up" << std::endl;
-    GameObjectStationary::print(os);
-    os << std::endl << std::endl;
+    return true;
 }
-
