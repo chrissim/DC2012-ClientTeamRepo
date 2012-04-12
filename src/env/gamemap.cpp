@@ -74,19 +74,16 @@ GameMap :: GameMap(QString fileName)
     }
     else
     {
-        if(doc.setContent(&map))
+        if(!doc.setContent(QTextStream(&map).readAll()))
         {
             qDebug() << "Failed to load the map";
         }
-        map.close();
     }
-
-    // get the root element
+    map.close();
     QDomElement maps = doc.firstChildElement();
 
     // create tiles
     arrangeElements(maps, "tile", "gid");
-
 }
 
 
@@ -120,15 +117,14 @@ void GameMap::arrangeElements(QDomElement root, QString tagname, QString attribu
         {
             QDomElement tile = itemnode.toElement();
         
-            if(tile.attribute(attribute) == 0)
+            if(tile.attribute(attribute) == "0")
             {
-                gameTiles_[posX / tileSize][posY / tileSize] = new SeaTile(Point(posX, posY));
+                this->gameTiles_[Point(posX, posY)] = new SeaTile(Point(posX, posY));
             }
             else
             {
-                gameTiles_[posX / tileSize][posY / tileSize] = new LandTile(Point(posX, posY));
+                this->gameTiles_[Point(posX, posY)] = new LandTile(Point(posX, posY));
             }
-
             if((posX += tileSize) == xSize)
             {
                 posX = 0;
@@ -136,6 +132,15 @@ void GameMap::arrangeElements(QDomElement root, QString tagname, QString attribu
             }
         }
     }
+}
+
+bool GameMap::isLand(const Point& location)
+{
+    Point temp(((int)(location.getX() / 25) * 25), ((int)(location.getY() / 25) * 25));
+    if(gameTiles_[temp] != 0)
+        if(gameTiles_[temp]->getTileType() == LAND)
+            return true;
+    return false;
 }
 
 

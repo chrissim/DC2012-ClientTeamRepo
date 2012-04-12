@@ -1,6 +1,7 @@
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
 
+#include "../env/gamemap.h"
 #include "../player/GOM_Ship.h"
 #include "../net/client.h"
 #include "MessageWrapper.h"
@@ -8,6 +9,7 @@
 #include "shipgraphicsobject.h"
 #include "projectilegraphicsobject.h"
 #include "audiocontroller.h"
+#include "../player/Point.h"
 
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
@@ -37,10 +39,12 @@ private:
     static const int FRAME_RATE = 40;
     static const int CLIENT_WIDTH = 1024;
     static const int CLIENT_HEIGHT = 768;
-    
+
     QGraphicsScene *scene_;
+    Point curPos;
     QTimer timer_;
     Client* client_;
+    GameMap* map_;
     std::queue<Message *> messageQueue_;
     std::map<int, ShipGraphicsObject *> ships_;
     std::map<int, ProjectileGraphicsObject *> otherGraphics_;
@@ -48,6 +52,7 @@ private:
     int clientId_;
     size_t timerCounter_;
     AudioController audio;
+    bool isClientDead_;
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);

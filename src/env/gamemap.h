@@ -9,7 +9,7 @@
 #include <QtXml/QtXml>
 #include <QtXml/QDomNode>
 #include <QDebug>
-#include <vector>
+#include <map>
 
 #include "../player/GameObjectStationary.h"
 #include "landtile.h"
@@ -17,19 +17,19 @@
 #include "tile.h"
 
 
-#define xSize 4000
-#define ySize 3000
+#define xSize (160 * tileSize)
+#define ySize (120 * tileSize)
 #define tileSize 25
-
 
 class GameMap
 {
     public:
         GameMap();
         GameMap(QString fileName);
+        bool isLand(const Point& location);
         int addTile(Tile tile);
         void arrangeElements(QDomElement root, QString tagname, QString attribute);
-        std::vector<std::vector<Tile*> > gameTiles_;
+        std::map<Point, Tile*> gameTiles_;
 
     private:
         QFile                           xmlMap_;
