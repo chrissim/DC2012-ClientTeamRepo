@@ -3,6 +3,7 @@
 
 #include <queue>
 #include <pthread.h>
+#include <unistd.h>
 #include "Semaphore.h"
 #include "Message.h"
 
